@@ -1,0 +1,11 @@
+PKG_CFLAGS = $(SHLIB_OPENMP_CFLAGS)
+PKG_LIBS = $(SHLIB_OPENMP_CFLAGS) $(FLIBS) -lstdc++
+C_OBJS = BNN.o
+
+OBJECTS = $(C_OBJS)
+
+all: $(SHLIB)
+$(SHLIB): $(OBJECTS)
+
+clean:
+	@rm -rf *.o *.mod *.d *.rc *.so *.dylib *.dll *.a *.lib $(SHLIB) $(OBJECTS)

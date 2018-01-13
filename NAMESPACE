@@ -1,0 +1,3 @@
+useDynLib(BNN,.registration = TRUE)
+importFrom("utils", "read.table")
+export(BNNsel,BNNprior)

@@ -1,0 +1,10 @@
+b36cda83bfe49fa1efd33b355762fca3 *DESCRIPTION
+c1e8404554b03a26b8fb84215b36038d *NAMESPACE
+0a283449e9cd6590c874526b59a3561b *R/BNN.R
+ac17979292c89945d4d2628ecdfa6907 *data/Topotecan.rda
+dda5cd1ffe50714804c3060cda26ab8c *man/BNN-package.Rd
+bf5d134bcbe5b690cbda679dbc66ef13 *man/BNNprior.Rd
+6f16d1eb9a563f75047f598dcf7ad682 *man/BNNsel.Rd
+962e295cbd75d5c1c1c8918f104151a3 *man/Topotecan.Rd
+3a06c2fe6a96f81ac0760da17ab5effe *src/BNN.c
+75fc1334905072c3da00acccb4bc1c36 *src/Makevars
