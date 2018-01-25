@@ -12,10 +12,7 @@ BNNsel <- function(X,Y,train_num = as.integer(0.8*N), hid_num = 3, lambda=0.025,
     for(j in 1:OUT_UNIT) DataY[(i-1)*OUT_UNIT+j]=Y[i,j];
   }
  # system("ulimit -s unlimited")
-  .C("posratio", as.numeric(DataX),as.numeric(DataY),
-     as.integer(train_num),as.integer(test_num),
-     as.integer(OUT_UNIT),as.integer(P),as.integer(hid_num),as.numeric(lambda),
-     as.integer(total_iteration),as.integer(popN),as.integer(nCPUs))
+  .C("posratio", as.numeric(DataX),as.numeric(DataY),as.integer(train_num),as.integer(test_num),as.integer(OUT_UNIT),as.integer(P),as.integer(hid_num),as.numeric(lambda),as.integer(total_iteration),as.integer(popN),as.integer(nCPUs))
   net <- as.numeric(read.table("aa.net"))
   prob <- as.numeric(read.table("aa.BF"))[1]
   mar <- as.numeric(read.table("aa.mar"))

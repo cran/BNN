@@ -11,8 +11,8 @@ Perform Bayesian variable selection for high-dimensional nonlinear systems. The 
 \tabular{rl}{
 Package: \tab BNN\cr
 Type: \tab Package\cr
-Version: \tab 1.0.0\cr
-Date: \tab 2018-01-08\cr
+Version: \tab 1.0.1\cr
+Date: \tab 2018-01-24\cr
 License: \tab GPL-2\cr
 }
 The Bayesian neural network used in the package is a one-hidden layer feedforward neural network with shortcut connections.
@@ -24,13 +24,13 @@ Bochao Jia, Faming Liang
 Maintainer: Bochao Jia<jbc409@ufl.edu>
 }
 \references{
-Liang, F., Li, Q. and Zhou, L. (2017) Bayesian Neural Networks for Selection of Drug Sensitive Genes.  Journal of the American Statistical Association, under revision. 
+Liang, F., Li, Q., and Zhou, L. (2017). Bayesian Neural Networks for Selection of Drug Sensitive Genes. Journal of the American Statistical Association.
 
 Xue, J. and Liang, F. (2017). Robust model-free feature screening for ultrahigh dimensional data.  Journal of Computational and Graphical Statistics, in press.
 }
 \examples{
-#library(BNN)
-#BNNprior(50, 1, hid_num = 3,lambda=0.025,total_iteration = 1000000, popN = 20)
+library(BNN)
+BNNprior(50, 1, hid_num = 3,lambda=0.025,total_iteration = 10000, popN = 10)
 }
 \keyword{ package }
 

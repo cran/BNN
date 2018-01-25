@@ -16,7 +16,7 @@
 
 
 \references{
-Liang, F., Li, Q. and Zhou, L. (2017) Bayesian Neural Networks for Selection of Drug Sensitive Genes. Journal of the American Statistical Association, under revision.
+Liang, F., Li, Q., and Zhou, L. (2017). Bayesian Neural Networks for Selection of Drug Sensitive Genes. Journal of the American Statistical Association.
 
 Xue, J. and Liang, F. (2017). Robust model-free feature screening for ultrahigh dimensional data. Journal of Computational and Graphical Statistics, in press. 
 }

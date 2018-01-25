@@ -2530,7 +2530,6 @@ void pratio(int *OUT_UNIT, int *P, int *hd1, double *lambda,
               int *total_iteration, int *popN)
 {
 
-  int stepscale = 500;
   
   GetRNGstate();
   int stime;
@@ -2540,7 +2539,7 @@ void pratio(int *OUT_UNIT, int *P, int *hd1, double *lambda,
   double q,w,un,un1, un2, linearity, nonlinearity;
   FILE *ins, *instr;
   char frname[15];
-  int warm0=*total_iteration/40,warm1=*total_iteration/40,warm2=*total_iteration/5,div=100,step=10,G,GG=1;
+  int warm0=ceil((double)*total_iteration/40.0),warm1=ceil((double)*total_iteration/40.0),warm2=ceil((double)*total_iteration/5.0), div=ceil((double)*total_iteration/10000.0),step=ceil((double)*total_iteration/100000.0),stepscale=ceil((double)*total_iteration/2000.0),G,GG=1;
   if(shortcut==0){ dim=((*P)+1)*(*hd1)+(1+(*hd1))*(*OUT_UNIT); dim0=((*P)+1)*(*hd1); }
   else{
     dim0=((*P)+1)*(*hd1);
@@ -3998,7 +3997,6 @@ void posratio(double DataX[], double DataY[], int *data_num, int *test_num, int 
 {
   //R_CStackLimit=(uintptr_t)-1;
   int inipopN = (*popN);
-  int stepscale=20000;
   
       
 #ifdef _OPENMP
@@ -4016,7 +4014,7 @@ void posratio(double DataX[], double DataY[], int *data_num, int *test_num, int 
       double gy, tem, *AIC, *BIC, *EBIC, *sAIC, *sBIC, *aAIC, *aBIC, logIAIC, logIBIC, aveAIC, aveBIC, KLAIC, KLBIC, KLEBIC;
       FILE *ins, *instr;
       char frname[15];
-      int warm0=*total_iteration/40,warm1=*total_iteration/40,warm2=*total_iteration/5, div=100,step=100,G,GG=1;
+      int warm0=ceil((double)*total_iteration/40.0),warm1=ceil((double)*total_iteration/40.0),warm2=ceil((double)*total_iteration/5.0), div=ceil((double)*total_iteration/10000.0),step=ceil((double)*total_iteration/10000.0),stepscale=ceil((double)*total_iteration/50.0),G,GG=1;
       /*
       ins=fopen("aa.log", "a");
       fprintf(ins, "\nseed=%d HD=%d (*P)=%d\n", stime,(*hd1),(*P));
@@ -4088,7 +4086,7 @@ void posratio(double DataX[], double DataY[], int *data_num, int *test_num, int 
       for(i=1; i<=(*data_num)+(*test_num); i++){
         for(j=1; j<=(*OUT_UNIT); j++){
           total_y[i][j] = DataY[(i-1)*(*OUT_UNIT)+(j-1)];
-          total_y[i][j] = sqrt(total_y[i][j]);
+          //total_y[i][j] = sqrt(total_y[i][j]);
         }
         for(j=1; j<=(*P); j++){
           total_mat[i][j] = DataX[(i-1)*(*P)+(j-1)];
@@ -4397,7 +4395,7 @@ for(iter=1; iter<=warm2+(*total_iteration); iter++){
       } /* end for iter>warm */
 } /* end for iter */
               //    fclose(instr);
-              for(j=1; j<=dim; j++) net[j]/=total_weight;  
+for(j=1; j<=dim; j++) net[j]/=total_weight;  
 for(j=1; j<=(*P)+1; j++) prob[j]/=total_weight;
 for(k=1; k<=(*data_num); k++) 
   for(j=1; j<=(*OUT_UNIT); j++) FIT[k][j]/=total_weight;
