@@ -25,8 +25,15 @@ BNNprior(dimX, dimY, hid_num = 3,lambda=0.025,total_iteration=1000000,popN = 20)
 }
 \author{ Bochao Jia and Faming Liang}
 \examples{
+\dontshow{
+library(BNN)
+BNNprior(10, 1, hid_num = 2, lambda=0.025, total_iteration = 10, popN = 3)
+}
+\donttest{
 library(BNN)
 BNNprior(50, 1, hid_num = 3, lambda=0.025, total_iteration = 10000, popN = 5)
+}
+
 }
 \references{
 Liang, F., Li, Q., and Zhou, L. (2017). Bayesian Neural Networks for Selection of Drug Sensitive Genes. Journal of the American Statistical Association.

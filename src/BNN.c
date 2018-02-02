@@ -11,6 +11,8 @@
 #include <Rconfig.h>
 #ifdef _OPENMP
 #include <omp.h>
+#else
+#define omp_get_thread_num() 0
 #endif
 
 //#define CSTACK_DEFNS 7
@@ -247,7 +249,7 @@ void ludcmp(a,n,indx,d)
   int n,*indx;
 double **a,*d;
 {
-  int i,imax,j,k;
+  int i,imax=0,j,k;
   double big,dum,sum,temp;
   double *vv;
   
@@ -329,7 +331,7 @@ double matrix_logdet(X, n)
 int n;
 {
   int j, *indx;
-  FILE *ins;
+ 
   double d, logdet;
   
   indx=ivector(1,n);
@@ -348,7 +350,7 @@ int n;
 {
   double d, *col;
   int i, j, *indx;
-  FILE *ins;
+  
   double logdet;
   
   col=dvector(1,n);
@@ -384,8 +386,8 @@ int n;
 {
   double d, *col;
   int i, j, *indx;
-  FILE *ins;
-  double logdet;
+  
+  
   
   col=dvector(1,n);
   indx=ivector(1,n);
@@ -560,7 +562,7 @@ double Rgamma(a,b)
   double a, b;
 {
     int ok;
-    double d, q, un, u1, y, z;
+    double d, q, un, u1=0.0, y, z;
     
     if(a<=0.0 || b<=0.0) {  Rprintf("Gamma parameter error (<0.0)\n"); return 0.0; }
     
@@ -807,7 +809,7 @@ double DLOGGAUSS(z,mean,variance,p)
   double *z, *mean, **variance;
 int p;
 {
-  int i,j;
+  int i;
   double logdet, sum, **mat,*vect, *mu;
   
   mat=dmatrix(1,p,1,p);
@@ -905,12 +907,12 @@ double dmaximum(z,n)
   double *z;
 int n;
 {
-  int i, maxi;
+  int i;
   double maxd;
   
-  maxd=z[1]; maxi=1;
+  maxd=z[1];
   for(i=2; i<=n; i++)
-    if(z[i]>maxd){ maxd=z[i]; maxi=i; }
+    if(z[i]>maxd){ maxd=z[i]; }
     
     return maxd;
 }
@@ -1167,7 +1169,7 @@ void gcfln(gammcf,a,x,gln)
 double gammp(a,x)
   double a,x;
 {
-    double gamser,gammcf,gln;
+    double gamser=1.0,gammcf,gln;
     /* void gser(),gcf(),nrerror(); */
     
     if (x < 0.0 || a <= 0.0) nrerror("Invalid arguments in routine GAMMP");
@@ -1184,7 +1186,7 @@ double gammp(a,x)
 double gammq(a,x)
   double a,x;
 {
-    double gamser,gammcf,gln;
+    double gamser=0.0,gammcf,gln;
     // void gcf(),gser(),nrerror();
     
     if (x < 0.0 || a <= 0.0) nrerror("Invalid arguments in routine GAMMQ");
@@ -1203,7 +1205,7 @@ double gammpln(a,x,tail)
   double a,x;
 int *tail;
 {
-  double gamserln,gammcfln,gln;
+  double gamserln=1.0,gammcfln,gln;
   /* void gser(),gcf(),nrerror(); */
   
   
@@ -1765,7 +1767,7 @@ int EstNull_fdr(x,n,gamma,mu,sigma)
 int n;
 {
   double *t, *phiplus, *phiminus, *dphiplus,*dphiminus, *phi, *dphi;
-  double gan, shat, uhat, epshat;
+  double gan, shat, uhat;
   double s, tt, a, b, c, da, db;
   int i, j;
   
@@ -1819,7 +1821,7 @@ int n;
   
   shat=sqrt(-(a*da+b*db)/(tt*c*c));
   uhat=-(da*b-db*a)/(c*c);
-  epshat=1-c*exp((tt*shat)*(tt*shat)/2);
+  
   
   *mu=uhat; 
   *sigma=shat; 
@@ -1899,7 +1901,7 @@ double standard_deviation(x,n)
   double *x;
 int n;
 {
-  int i, j;
+  int i;
   double ave, sumq, sd;
   
   for(ave=0.0, sumq=0.0, i=1; i<=n; i++){
@@ -1963,11 +1965,11 @@ double priorcost(int *W, int hd1, int OUT_UNIT, int P, double lambda)
 // begin "mutationPriorg.c"
 int add_connection_prior(int *W,double *fz,double tem,int *region, double **hist, int hd1, int OUT_UNIT, int P, double lambda)
 {
-  int i,j,m,s,H,k,K,L,d,accept,k1,k2,*D,**node,AA,B;
-  double fnew, un, mean=0.0, var=1.0, r,aicnew,bicnew, ebicnew;
+  int i,j,m,s,H,k,K,L,d,accept,k1,k2,**node,AA,B;
+  double fnew, un, r;
   double p1, p2, pxy, pyx;
   int newregion,cold, cnew;
-  FILE *ins;
+  
   
   
   node=imatrix(1,(hd1)+(OUT_UNIT),1,2);
@@ -2250,11 +2252,11 @@ int add_connection_prior(int *W,double *fz,double tem,int *region, double **hist
 
 int del_connection_prior(int *W,double *fz,double tem,int *region, double **hist, int hd1, int OUT_UNIT, int P, double lambda)
 {
-  int i,j,k,K,m,s,d,H,L,accept,k1,k2,AA,B,*D;
-  double fnew,un,r,mean=0.0,var=1.0,aicnew,bicnew, ebicnew;
-  double p1, p2, pxy, pyx;
+  int i,j,k,K,m,s,d,H,L,accept,k1=1,k2,AA,B=1;
+  double fnew,un,r;
+  double p1, p2, pxy=1.0, pyx=1.0;
   int newregion,cold, cnew, **node;
-  FILE *ins;
+  
   
   node=imatrix(1,(hd1)+(OUT_UNIT),1,2);
   for(cold=0, i=1; i<=dim; i++) cold+=W[i];
@@ -2497,9 +2499,9 @@ int del_connection_prior(int *W,double *fz,double tem,int *region, double **hist
 
 int mutation_SAMC_prior(int *WW,double *fvalue,double t,int *pos,double **hist, int hd1, int OUT_UNIT, int P, double lambda)
 {
-  int i, k, m, region;
-  double un, fx, fy, r, aicm, bicm, ebicm;
-  int accept;
+  int i, m, region;
+  double un, fx;
+  
   
   fx=*fvalue; 
   region=*pos;
@@ -2532,14 +2534,14 @@ void pratio(int *OUT_UNIT, int *P, int *hd1, double *lambda,
 
   
   GetRNGstate();
-  int stime;
-  long ltime;
+  
+  
   double *fvalue,**hist, *t, total_weight, *locfreq, ave, max, sum;
-  int i, j, k0, k, v, iter, m,s1,s2,dim0,**WW,*pos, position;
-  double q,w,un,un1, un2, linearity, nonlinearity;
-  FILE *ins, *instr;
-  char frname[15];
-  int warm0=ceil((double)*total_iteration/40.0),warm1=ceil((double)*total_iteration/40.0),warm2=ceil((double)*total_iteration/5.0), div=ceil((double)*total_iteration/10000.0),step=ceil((double)*total_iteration/100000.0),stepscale=ceil((double)*total_iteration/2000.0),G,GG=1;
+  int i, j, k0, iter, m,s1,s2,dim0,**WW,*pos;
+  double w, linearity, nonlinearity;
+  FILE *ins;
+  
+  int warm2=ceil((double)*total_iteration/5.0),step=ceil((double)*total_iteration/100000.0),stepscale=ceil((double)*total_iteration/2000.0);
   if(shortcut==0){ dim=((*P)+1)*(*hd1)+(1+(*hd1))*(*OUT_UNIT); dim0=((*P)+1)*(*hd1); }
   else{
     dim0=((*P)+1)*(*hd1);
@@ -2736,7 +2738,7 @@ void pratio(int *OUT_UNIT, int *P, int *hd1, double *lambda,
 int fden(double *ox,double *z,int *W,double *ps2, int hd1, int OUT_UNIT, int P)
 {
   int i, j, k;
-  double sum, ps1[(hd1)+1],ave, b; 
+  double ps1[(hd1)+1],ave; 
   
   /* calculate the output of the first hidden layer */
   for(i=1; i<=(hd1); i++){
@@ -2771,9 +2773,9 @@ int fden(double *ox,double *z,int *W,double *ps2, int hd1, int OUT_UNIT, int P)
 
 double cost(double *z,int *W,double *aic0,double *bic0,double *ebic0, int hd1, int OUT_UNIT, int P, double lambda, int data_num)
 {
-  double *ps2,sum,sum0,sum1,sum2,sum3,sum4, un, ww; 
-  int i, j,k, k0, m1, m2, m3, OK;
-  FILE *ins;
+  double *ps2,sum,sum0,sum1,sum2,sum3,sum4; 
+  int i, j,k, k0, m1, m2, OK;
+  
   
   // the connection weights from hidden to output: k0+2, ..., k0+(hd1)+1  
   k0=((P)+1)*(hd1); 
@@ -2912,11 +2914,11 @@ int Metropolis_mut(double *z,double *fz,double tem,int *W,double *aic,double *bi
 
 int add_connection(double *z,double *fz,double tem,int *W,double *aic,double *bic,double *ebic, int hd1, int OUT_UNIT, int P, double lambda, int data_num)
 {
-  int i,j,k,m,L,s,accept, k2,*D,**node,A,B;
+  int i,j,k,m,L,s,accept, k2=1,*D,**node,A,B;
   double fnew, un, mean, var, r,aicnew,bicnew, ebicnew;
   double p1, p2;
   int cold, cnew;
-  FILE *ins;
+  
   
   /*
   if(check(W)==1){ Rprintf("network starting error\n"); exit; }
@@ -3109,11 +3111,11 @@ int add_connection(double *z,double *fz,double tem,int *W,double *aic,double *bi
 
 int del_connection(double *z,double *fz,double tem,int *W,double *aic,double *bic,double *ebic, int hd1, int OUT_UNIT, int P, double lambda, int data_num)
 {
-  int i,j,k,m,s,L,accept,k2,A,B,*D;
+  int i,j,k,m,s,L,accept,k2=1,A,B,*D;
   double fnew,un,r,mean,var,aicnew,bicnew, ebicnew;
   double p1, p2;
   int cold, cnew, **node;
-  FILE *ins;
+  
   
   
   /*
@@ -3285,9 +3287,9 @@ int del_connection(double *z,double *fz,double tem,int *W,double *aic,double *bi
 int mutationMH(double *x,double *fvalue,double t,int *WW, int state, double *aic,double *bic,double *ebic, int hd1, int OUT_UNIT, int P, double lambda, int data_num)
 
 {
-  int i, k, m;
-  double un, fx, fy, r, aicm, bicm, ebicm;
-  int accept;
+  int i, m;
+  double un, fx, aicm, bicm, ebicm;
+  
   
   fx=*fvalue; aicm=*aic; bicm=*bic; ebicm=*ebic;
   if(state==0) Metropolis_mut(x,&fx,t,WW,&aicm,&bicm, &ebicm, hd1, OUT_UNIT, P, lambda, data_num);
@@ -3398,11 +3400,11 @@ int Metropolis_mut_SAMC(double *z,double *fz,double tem,int *W,int *region,doubl
 
 int add_connection_SAMC(double *z,double *fz,double tem,int *W,int *region,double **hist,double *aic,double *bic,double *ebic, int hd1, int OUT_UNIT, int P, double lambda, int data_num)
 {
-  int i,j,m,s,H,k,K,L,d,accept,k1,k2,*D,**node,AA,B;
+  int i,j,m,s,H,k,K,L,d,accept,k1,k2,**node,AA,B;
   double fnew, un, mean=0.0, var=1.0, r,aicnew,bicnew, ebicnew;
   double p1, p2, pxy, pyx;
   int newregion,cold, cnew;
-  FILE *ins;
+  
   
   grid=ceil((maxE-lowE)*scale);
   node=imatrix(1,(hd1)+(OUT_UNIT),1,2);
@@ -3655,11 +3657,11 @@ int add_connection_SAMC(double *z,double *fz,double tem,int *W,int *region,doubl
 
 int del_connection_SAMC(double *z,double *fz,double tem,int *W,int *region,double **hist,double *aic,double *bic,double *ebic, int hd1, int OUT_UNIT, int P, double lambda, int data_num)
 {
-  int i,j,k,K,m,s,d,H,L,accept,k1,k2,AA,B,*D;
+  int i,j,k,K,m,s,d,H,L,accept,k1=1,k2,AA,B=1;
   double fnew,un,r,mean=0.0,var=1.0,aicnew,bicnew, ebicnew;
-  double p1, p2, pxy, pyx;
+  double p1, p2, pxy=1.0, pyx=1.0;
   int newregion,cold, cnew, **node;
-  FILE *ins;
+  
   
   
   grid=ceil((maxE-lowE)*scale);
@@ -3913,9 +3915,9 @@ int del_connection_SAMC(double *z,double *fz,double tem,int *W,int *region,doubl
 
 int mutation_SAMC(double *x,double *fvalue,double t,int *WW,int *pos,double **hist,int state,double *aic,double *bic,double *ebic, int hd1, int OUT_UNIT, int P, double lambda, int data_num)
 {
-  int i, k, m, region;
-  double un, fx, fy, r, aicm, bicm, ebicm;
-  int accept;
+  int i, m, region;
+  double un, fx, aicm, bicm, ebicm;
+  
   
   fx=*fvalue; aicm=*aic; bicm=*bic; ebicm=*ebic;
   region=*pos;
@@ -3958,7 +3960,7 @@ int mutation_SAMC(double *x,double *fvalue,double t,int *WW,int *pos,double **hi
 int fitting(double *ox,double *z,int *W,double *ps2, int hd1, int OUT_UNIT, int P)
 {
   int i, j, k;
-  double sum, ps1[(hd1)+1], ave, b; 
+  double ps1[(hd1)+1], ave; 
   
   /* calculate the output of the first hidden layer */
   for(i=1; i<=(hd1); i++){
@@ -3992,556 +3994,555 @@ int fitting(double *ox,double *z,int *W,double *ps2, int hd1, int OUT_UNIT, int 
 //end: fitting.c
 
 
-void posratio(double DataX[], double DataY[], int *data_num, int *test_num, int *OUT_UNIT, int *P, int *hd1, double *lambda,
-              int *total_iteration, int *popN, int *nCPUs)
+void posratio(double DataX[], double DataY[], int *data_num, int *test_num, int *OUT_UNIT, int *P, int *hd1, double *lambda, int *total_iteration, int *popN, int *nCPUs)
 {
   //R_CStackLimit=(uintptr_t)-1;
   int inipopN = (*popN);
   
-      
+  
 #ifdef _OPENMP
-      omp_set_num_threads(*nCPUs);
+  omp_set_num_threads(*nCPUs);
 #endif
-      
-      GetRNGstate();
-      
-      int stime;
-      long ltime;
-      double **x,**sx,*y,*fvalue,*sfvalue,*fx,*fy,*t,**total_mat,*ps2,**FIT,**PRED,**total_y,**hist;
-      int count,grid0,maxpopN,i, j, k0, k, v, iter, m, L, s1,s2,dim0,bestk,newgrid,**WW,**sWW,*W,*rem,*sel,*pos, position,*indx;
-      double q,w,un,netave,bias,predbias,beta,mis1,mis2, un1, un2, linearity;
-      double *mar, *prob, total_weight, *net, *locfreq, energy, ave, max, sum, minF,maxhist;
-      double gy, tem, *AIC, *BIC, *EBIC, *sAIC, *sBIC, *aAIC, *aBIC, logIAIC, logIBIC, aveAIC, aveBIC, KLAIC, KLBIC, KLEBIC;
-      FILE *ins, *instr;
-      char frname[15];
-      int warm0=ceil((double)*total_iteration/40.0),warm1=ceil((double)*total_iteration/40.0),warm2=ceil((double)*total_iteration/5.0), div=ceil((double)*total_iteration/10000.0),step=ceil((double)*total_iteration/10000.0),stepscale=ceil((double)*total_iteration/50.0),G,GG=1;
-      /*
-      ins=fopen("aa.log", "a");
-      fprintf(ins, "\nseed=%d HD=%d (*P)=%d\n", stime,(*hd1),(*P));
-      fclose(ins);
-      */
-      if(shortcut==0){ dim=((*P)+1)*(*hd1)+(1+(*hd1))*(*OUT_UNIT); dim0=((*P)+1)*(*hd1); }
-      else{  
-        dim0=((*P)+1)*(*hd1); 
-        dim=((*P)+1)*(*hd1)+(1+(*hd1)+(*P))*(*OUT_UNIT);
-      }  
-      if(connection_threshold>dim) connection_threshold=dim;
-      
-      if(inipopN>(*popN)) maxpopN=inipopN; 
-      else maxpopN=(*popN);
-      
-      x=dmatrix(1,maxpopN,1,dim);
-      sx=dmatrix(1,maxpopN,1,dim);
-      y=dvector(1,dim);
-      net=dvector(1,dim);
-      WW=imatrix(1,maxpopN,1,dim);
-      sWW=imatrix(1,maxpopN,1,dim);
-      W=ivector(1,dim);
-      fvalue=dvector(1,maxpopN);
-      sfvalue=dvector(1,maxpopN);
-      t=dvector(1,maxpopN);
-      total_mat=dmatrix(1,((*data_num)+(*test_num)),1,(*P));
-      total_y=dmatrix(1,((*data_num)+(*test_num)),1,(*OUT_UNIT));
-      data_mat=dmatrix(1,(*data_num),1,(*P));
-      test_mat=dmatrix(1,(*test_num),1,(*P));
-      data_y=dmatrix(1,(*data_num),1,(*OUT_UNIT));
-      test_y=dmatrix(1,(*test_num),1,(*OUT_UNIT));
-      ps2=dvector(1,(*OUT_UNIT));
-      sel=ivector(1,(*data_num));
-      rem=ivector(1,((*data_num)+(*test_num)));
-      FIT=dmatrix(1,(*data_num),1,(*OUT_UNIT));
-      PRED=dmatrix(1,(*test_num),1,(*OUT_UNIT));
-      wei=dvector(1,(*data_num));
-      indx=ivector(1,1000);
-      fx=dvector(1,1000);
-      fy=dvector(1,1000);
-      mar=dvector(1,(*P)+1);
-      prob=dvector(1,(*P)+1);
-      AIC=dvector(1,maxpopN);
-      BIC=dvector(1,maxpopN);
-      EBIC=dvector(1,maxpopN);
-      sAIC=dvector(1,(*popN)*(*total_iteration));
-      sBIC=dvector(1,(*popN)*(*total_iteration));
-      aAIC=dvector(1,(*popN)*(*total_iteration));
-      aBIC=dvector(1,(*popN)*(*total_iteration));
-      
-      
-      t[1]=hightem;  t[(*popN)]=lowtem;
-      q=(1.0/lowtem-1.0/hightem)/((*popN)-1);
-      for(i=2; i<=(*popN)-1; i++) t[i]=1.0/(q+1.0/t[i-1]);
-      
-      
-      /*
-      if(v==0) lambda=0.01;
-      else if(v==1) lambda=0.05;
-      else if(v==2) lambda=0.1;
-      else lambda=0.2;
-      */
-      /*
-      ins=fopen("aa.log", "a");
-      fprintf(ins, "lambda=%g\n", lambda);
-      fclose(ins);
-      */
-      /* read the data from DataX, DataY */
-      for(i=1; i<=(*data_num)+(*test_num); i++){
-        for(j=1; j<=(*OUT_UNIT); j++){
-          total_y[i][j] = DataY[(i-1)*(*OUT_UNIT)+(j-1)];
-          //total_y[i][j] = sqrt(total_y[i][j]);
-        }
-        for(j=1; j<=(*P); j++){
-          total_mat[i][j] = DataX[(i-1)*(*P)+(j-1)];
-        } 
-      }
-      /*
-      if(v==0){ 
-      for(i=1; i<=(*test_num); i++) rem[i]=i;
-      for(i=1; i<=(*data_num); i++) sel[i]=(*test_num)+i;
-      }
-      else if(v==1){ 
-      for(i=1; i<=(*test_num); i++) sel[i]=i;
-      for(i=(*test_num)+1; i<=2*(*test_num); i++) rem[i-(*test_num)]=i;
-      for(i=2*(*test_num)+1; i<=(*data_num)+(*test_num); i++) sel[i-(*test_num)]=i; 
-      }
-      else if(v==2){
-      for(i=1; i<=2*(*test_num); i++) sel[i]=i;
-      for(i=2*(*test_num)+1; i<=3*(*test_num); i++) rem[i-2*(*test_num)]=i;
-      for(i=3*(*test_num)+1; i<=(*data_num)+(*test_num); i++) sel[i-(*test_num)]=i; 
-      }
-      else if(v==3){
-      for(i=1; i<=3*(*test_num); i++) sel[i]=i;
-      for(i=3*(*test_num)+1; i<=4*(*test_num); i++) rem[i-3*(*test_num)]=i;
-      for(i=4*(*test_num)+1; i<=(*data_num)+(*test_num); i++) sel[i-(*test_num)]=i;
-      }
-      else{
-      for(i=1; i<=(*data_num); i++) sel[i]=i;
-      for(i=1; i<=(*test_num); i++) rem[i]=(*data_num)+i;
-      }
-      */
-      
-      for(i=1; i<=(*data_num); i++){
-        for(j=1; j<=(*OUT_UNIT); j++) data_y[i][j]=total_y[i][j];
-        for(j=1; j<=(*P); j++) data_mat[i][j]=total_mat[i][j];
-      }
-      
-      for(i=1; i<=(*test_num); i++){
-        for(j=1; j<=(*OUT_UNIT); j++) test_y[i][j]=total_y[i+(*data_num)][j];
-        for(j=1; j<=(*P); j++) test_mat[i][j]=total_mat[i+(*data_num)][j];
-      }
-      for(i=1; i<=(*data_num); i++) wei[i]=1.0;
-      
-      
+  
+  GetRNGstate();
+  
+  
+  
+  double **x,**sx,*y,*fvalue,*sfvalue,*fx,*fy,*t,**total_mat,*ps2,**FIT,**PRED,**total_y,**hist;
+  int count,grid0,maxpopN,i, j, k0, k, iter, m, s1,dim0,bestk=1,newgrid,**WW,**sWW,*W,*rem,*sel,*pos,*indx;
+  double q,w,bias,predbias,mis1,mis2, linearity;
+  double *mar, *prob, total_weight, *net, *locfreq, energy, ave, max, sum, maxhist;
+  double  *AIC, *BIC, *EBIC, *sAIC, *sBIC, *aAIC, *aBIC, logIAIC, logIBIC, KLAIC, KLBIC, KLEBIC;
+  FILE *ins;
+  
+  int warm0=ceil((double)*total_iteration/40.0),warm1=ceil((double)*total_iteration/40.0),warm2=ceil((double)*total_iteration/5.0), div=ceil((double)*total_iteration/10000.0),step=ceil((double)*total_iteration/10000.0),stepscale=ceil((double)*total_iteration/50.0);
+  /*
+  ins=fopen("aa.log", "a");
+  fprintf(ins, "\nseed=%d HD=%d (*P)=%d\n", stime,(*hd1),(*P));
+  fclose(ins);
+  */
+  if(shortcut==0){ dim=((*P)+1)*(*hd1)+(1+(*hd1))*(*OUT_UNIT); dim0=((*P)+1)*(*hd1); }
+  else{  
+    dim0=((*P)+1)*(*hd1); 
+    dim=((*P)+1)*(*hd1)+(1+(*hd1)+(*P))*(*OUT_UNIT);
+  }  
+  if(connection_threshold>dim) connection_threshold=dim;
+  
+  if(inipopN>(*popN)) maxpopN=inipopN; 
+  else maxpopN=(*popN);
+  
+  x=dmatrix(1,maxpopN,1,dim);
+  sx=dmatrix(1,maxpopN,1,dim);
+  y=dvector(1,dim);
+  net=dvector(1,dim);
+  WW=imatrix(1,maxpopN,1,dim);
+  sWW=imatrix(1,maxpopN,1,dim);
+  W=ivector(1,dim);
+  fvalue=dvector(1,maxpopN);
+  sfvalue=dvector(1,maxpopN);
+  t=dvector(1,maxpopN);
+  total_mat=dmatrix(1,((*data_num)+(*test_num)),1,(*P));
+  total_y=dmatrix(1,((*data_num)+(*test_num)),1,(*OUT_UNIT));
+  data_mat=dmatrix(1,(*data_num),1,(*P));
+  test_mat=dmatrix(1,(*test_num),1,(*P));
+  data_y=dmatrix(1,(*data_num),1,(*OUT_UNIT));
+  test_y=dmatrix(1,(*test_num),1,(*OUT_UNIT));
+  ps2=dvector(1,(*OUT_UNIT));
+  sel=ivector(1,(*data_num));
+  rem=ivector(1,((*data_num)+(*test_num)));
+  FIT=dmatrix(1,(*data_num),1,(*OUT_UNIT));
+  PRED=dmatrix(1,(*test_num),1,(*OUT_UNIT));
+  wei=dvector(1,(*data_num));
+  indx=ivector(1,1000);
+  fx=dvector(1,1000);
+  fy=dvector(1,1000);
+  mar=dvector(1,(*P)+1);
+  prob=dvector(1,(*P)+1);
+  AIC=dvector(1,maxpopN);
+  BIC=dvector(1,maxpopN);
+  EBIC=dvector(1,maxpopN);
+  sAIC=dvector(1,(*popN)*(*total_iteration));
+  sBIC=dvector(1,(*popN)*(*total_iteration));
+  aAIC=dvector(1,(*popN)*(*total_iteration));
+  aBIC=dvector(1,(*popN)*(*total_iteration));
+  
+  
+  t[1]=hightem;  t[(*popN)]=lowtem;
+  q=(1.0/lowtem-1.0/hightem)/((*popN)-1);
+  for(i=2; i<=(*popN)-1; i++) t[i]=1.0/(q+1.0/t[i-1]);
+  
+  
+  /*
+  if(v==0) lambda=0.01;
+  else if(v==1) lambda=0.05;
+  else if(v==2) lambda=0.1;
+  else lambda=0.2;
+  */
+  /*
+  ins=fopen("aa.log", "a");
+  fprintf(ins, "lambda=%g\n", lambda);
+  fclose(ins);
+  */
+  /* read the data from DataX, DataY */
+  for(i=1; i<=(*data_num)+(*test_num); i++){
+    for(j=1; j<=(*OUT_UNIT); j++){
+      total_y[i][j] = DataY[(i-1)*(*OUT_UNIT)+(j-1)];
+      //total_y[i][j] = sqrt(total_y[i][j]);
+    }
+    for(j=1; j<=(*P); j++){
+      total_mat[i][j] = DataX[(i-1)*(*P)+(j-1)];
+    } 
+  }
+  /*
+  if(v==0){ 
+  for(i=1; i<=(*test_num); i++) rem[i]=i;
+  for(i=1; i<=(*data_num); i++) sel[i]=(*test_num)+i;
+  }
+  else if(v==1){ 
+  for(i=1; i<=(*test_num); i++) sel[i]=i;
+  for(i=(*test_num)+1; i<=2*(*test_num); i++) rem[i-(*test_num)]=i;
+  for(i=2*(*test_num)+1; i<=(*data_num)+(*test_num); i++) sel[i-(*test_num)]=i; 
+  }
+  else if(v==2){
+  for(i=1; i<=2*(*test_num); i++) sel[i]=i;
+  for(i=2*(*test_num)+1; i<=3*(*test_num); i++) rem[i-2*(*test_num)]=i;
+  for(i=3*(*test_num)+1; i<=(*data_num)+(*test_num); i++) sel[i-(*test_num)]=i; 
+  }
+  else if(v==3){
+  for(i=1; i<=3*(*test_num); i++) sel[i]=i;
+  for(i=3*(*test_num)+1; i<=4*(*test_num); i++) rem[i-3*(*test_num)]=i;
+  for(i=4*(*test_num)+1; i<=(*data_num)+(*test_num); i++) sel[i-(*test_num)]=i;
+  }
+  else{
+  for(i=1; i<=(*data_num); i++) sel[i]=i;
+  for(i=1; i<=(*test_num); i++) rem[i]=(*data_num)+i;
+  }
+  */
+  
+  for(i=1; i<=(*data_num); i++){
+    for(j=1; j<=(*OUT_UNIT); j++) data_y[i][j]=total_y[i][j];
+    for(j=1; j<=(*P); j++) data_mat[i][j]=total_mat[i][j];
+  }
+  
+  for(i=1; i<=(*test_num); i++){
+    for(j=1; j<=(*OUT_UNIT); j++) test_y[i][j]=total_y[i+(*data_num)][j];
+    for(j=1; j<=(*P); j++) test_mat[i][j]=total_mat[i+(*data_num)][j];
+  }
+  for(i=1; i<=(*data_num); i++) wei[i]=1.0;
+  
+  
 #pragma omp parallel for private(i,j,iter,k0,m) default(shared)
-      for(i=1; i<=inipopN; i++){
-        
-        for(j=1; j<=dim; j++) WW[i][j]=0;
-        k0=6;
-        while (k0>5) k0=floor(unif_rand()*5)+1;
-        for(j=1; j<=k0; j++){
-          m=(*P)+2;
-          while(m>(*P)+1) m=floor(unif_rand()*((*P)+1))+1;
-          WW[i][m]=1;
-        }
-        WW[i][(*hd1)*((*P)+1)+2]=1;
-        
-        fvalue[i]=1.0e+100;
-        while(fvalue[i]>1.0e+99){
-          for(j=1; j<=dim; j++) x[i][j]=gasdev()*0.1;
-          fvalue[i]=cost(x[i],WW[i],&(AIC[i]), &(BIC[i]), &(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num);
-        }
-        
-        for(iter=1; iter<=warm0; iter++){
-          if(iter<warm0/div) mutationMH(x[i],&(fvalue[i]),1.0,WW[i],0, &(AIC[i]), &(BIC[i]), &(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num);
-          else mutationMH(x[i],&(fvalue[i]),1.0,WW[i],1, &(AIC[i]), &(BIC[i]), &(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num); 
-          // if(iter%10000==0) Rprintf("inipop=%d iter=%d fvalue=%g\n", i, iter, fvalue[i]);
-        }
-      }
+  for(i=1; i<=inipopN; i++){
+    
+    for(j=1; j<=dim; j++) WW[i][j]=0;
+    k0=6;
+    while (k0>5) k0=floor(unif_rand()*5)+1;
+    for(j=1; j<=k0; j++){
+      m=(*P)+2;
+      while(m>(*P)+1) m=floor(unif_rand()*((*P)+1))+1;
+      WW[i][m]=1;
+    }
+    WW[i][(*hd1)*((*P)+1)+2]=1;
+    
+    fvalue[i]=1.0e+100;
+    while(fvalue[i]>1.0e+99){
+      for(j=1; j<=dim; j++) x[i][j]=gasdev()*0.1;
+      fvalue[i]=cost(x[i],WW[i],&(AIC[i]), &(BIC[i]), &(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num);
+    }
+    
+    for(iter=1; iter<=warm0; iter++){
+      if(iter<warm0/div) mutationMH(x[i],&(fvalue[i]),1.0,WW[i],0, &(AIC[i]), &(BIC[i]), &(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num);
+      else mutationMH(x[i],&(fvalue[i]),1.0,WW[i],1, &(AIC[i]), &(BIC[i]), &(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num); 
+      // if(iter%10000==0) Rprintf("inipop=%d iter=%d fvalue=%g\n", i, iter, fvalue[i]);
+    }
+  }
 #pragma omp barrier    
-      k=inipopN;
-      for(i=1; i<=k; i++) fx[i]=fvalue[i];
-      indexx(k,fx,indx); 
-      k0=floor(k*0.9); 
-      if(k0<1) k0=1;
-      for(i=1; i<=k0; i++) fy[i]=fx[indx[i]];
-      q=standard_deviation(fy,k0);
-      lowE=fx[indx[1]]-exL*q;
-      bestE=fx[indx[1]];
-      maxE=bestE+range; 
-      //  Rprintf("lowE=%g  maxE=%g\n", lowE, maxE);
-      //  lowE=200.0; maxE=300.0;
-      
-      /*
-      ins=fopen("aa.log","a");
-      fprintf(ins, "lowE=%g  maxE=%g\n", lowE, maxE);
-      fclose(ins);
-      */
-      
-      grid=ceil((maxE-lowE)*scale);
-      hist=dmatrix(0,grid,1,3);
-      refden=dvector(0,grid);
-      pos=ivector(0,grid);
-      locfreq=dvector(0,grid);
-      grid0=floor((bestE-lowE)*scale)-extgrid;
-      if(grid0<0) grid0=0;
-      
-      /* Initialize the configurations */
-      for(sum=0.0, i=0; i<grid; i++){ refden[i]=1.0; sum+=refden[i]; }
-      // for(i=0; i<=grid; i++) refden[i]/=sum;
-      for(i=0; i<=grid; i++){
-        hist[i][1]=lowE+i*1.0/scale;
-        hist[i][2]=0.0;
-        hist[i][3]=0.0;
-      }
-      
-      
-      // run MH algorithm to get good starting points
-      k=0;
-      while(k<(*popN)){
-        
+  k=inipopN;
+  for(i=1; i<=k; i++) fx[i]=fvalue[i];
+  indexx(k,fx,indx); 
+  k0=floor(k*0.9); 
+  if(k0<1) k0=1;
+  for(i=1; i<=k0; i++) fy[i]=fx[indx[i]];
+  q=standard_deviation(fy,k0);
+  lowE=fx[indx[1]]-exL*q;
+  bestE=fx[indx[1]];
+  maxE=bestE+range; 
+  //  Rprintf("lowE=%g  maxE=%g\n", lowE, maxE);
+  //  lowE=200.0; maxE=300.0;
+  
+  /*
+  ins=fopen("aa.log","a");
+  fprintf(ins, "lowE=%g  maxE=%g\n", lowE, maxE);
+  fclose(ins);
+  */
+  
+  grid=ceil((maxE-lowE)*scale);
+  hist=dmatrix(0,grid,1,3);
+  refden=dvector(0,grid);
+  pos=ivector(0,grid);
+  locfreq=dvector(0,grid);
+  grid0=floor((bestE-lowE)*scale)-extgrid;
+  if(grid0<0) grid0=0;
+  
+  /* Initialize the configurations */
+  for(sum=0.0, i=0; i<grid; i++){ refden[i]=1.0; sum+=refden[i]; }
+  // for(i=0; i<=grid; i++) refden[i]/=sum;
+  for(i=0; i<=grid; i++){
+    hist[i][1]=lowE+i*1.0/scale;
+    hist[i][2]=0.0;
+    hist[i][3]=0.0;
+  }
+  
+  
+  // run MH algorithm to get good starting points
+  k=0;
+  while(k<(*popN)){
+    
 #pragma omp parallel for private(i,j,k0,m,iter) default(shared)
-        for(i=1; i<=(*popN); i++){ 
-          
-          for(j=1; j<=dim; j++) sWW[i][j]=0;
-          k0=6;
-          while (k0>5) k0=floor(unif_rand()*5)+1;
-          for(j=1; j<=k0; j++){
-            m=(*P)+2;
-            while(m>(*P)+1) m=floor(unif_rand()*((*P)+1))+1;
-            sWW[i][m]=1;
-          }
-          sWW[i][(*hd1)*((*P)+1)+2]=1;
-          
-          sfvalue[i]=1.0e+100;
-          while(sfvalue[i]>1.0e+99){
-            for(j=1; j<=dim; j++) sx[i][j]=gasdev()*0.1;
-            sfvalue[i]=cost(sx[i],sWW[i],&(AIC[i]), &(BIC[i]), &(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num);
-          }
-          
-          for(iter=1; iter<=warm1; iter++){
-            if(iter<warm1/div) mutationMH(sx[i],&(sfvalue[i]),t[i],sWW[i],0,&(AIC[i]),&(BIC[i]),&(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num);
-            else mutationMH(sx[i],&(sfvalue[i]),t[i],sWW[i],1,&(AIC[i]),&(BIC[i]),&(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num); 
-            // if(iter%10000==0) Rprintf("pop=%d iter=%d fvalue=%g\n", i, iter, sfvalue[i]);
-          }
-        } 
+    for(i=1; i<=(*popN); i++){ 
+      
+      for(j=1; j<=dim; j++) sWW[i][j]=0;
+      k0=6;
+      while (k0>5) k0=floor(unif_rand()*5)+1;
+      for(j=1; j<=k0; j++){
+        m=(*P)+2;
+        while(m>(*P)+1) m=floor(unif_rand()*((*P)+1))+1;
+        sWW[i][m]=1;
+      }
+      sWW[i][(*hd1)*((*P)+1)+2]=1;
+      
+      sfvalue[i]=1.0e+100;
+      while(sfvalue[i]>1.0e+99){
+        for(j=1; j<=dim; j++) sx[i][j]=gasdev()*0.1;
+        sfvalue[i]=cost(sx[i],sWW[i],&(AIC[i]), &(BIC[i]), &(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num);
+      }
+      
+      for(iter=1; iter<=warm1; iter++){
+        if(iter<warm1/div) mutationMH(sx[i],&(sfvalue[i]),t[i],sWW[i],0,&(AIC[i]),&(BIC[i]),&(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num);
+        else mutationMH(sx[i],&(sfvalue[i]),t[i],sWW[i],1,&(AIC[i]),&(BIC[i]),&(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num); 
+        // if(iter%10000==0) Rprintf("pop=%d iter=%d fvalue=%g\n", i, iter, sfvalue[i]);
+      }
+    } 
 #pragma omp barrier      
-        for(i=1; i<=(*popN); i++){
-          if(k<(*popN) && sfvalue[i]<maxE){
-            k++;
-            fvalue[k]=sfvalue[i];
-            for(j=1; j<=dim; j++){ x[k][j]=sx[i][j]; WW[k][j]=sWW[i][j]; }
-            
-            if(fvalue[k]>maxE) pos[k]=grid;
-            else if(fvalue[k]<lowE) pos[k]=0;
-            else pos[k]=floor((fvalue[k]-lowE)*scale);
-          }
-          if(k>0 && pos[k]>=grid) k--; 
-        }
-        // Rprintf("Initial points k=%d\n", k);
-      }
-      
-      
-      /*
-      for(i=1; i<=(*popN); i++){
-      Rprintf("pos[%d]=%d, %g\n",i,pos[i],fvalue[i]);
-      un=cost(x[i],WW[i],&(AIC[i]),&(BIC[i]));
-      Rprintf("un=%g\n", un);
-      }
-      */
-      
-      for(j=1; j<=dim; j++) net[j]=0.0;
-      for(j=1; j<=(*P)+1; j++) prob[j]=0.0;
-      total_weight=0.0; energy=0.0; bias=predbias=0.0;  KLAIC=KLBIC=KLEBIC=0.0;
-      accept_mut=0; total_mut=1; linearity=0.0;  count=0;
-      for(i=1; i<=(*data_num); i++)
-        for(j=1; j<=(*OUT_UNIT); j++) FIT[i][j]=0.0;
-      for(i=1; i<=(*test_num); i++)
-        for(j=1; j<=(*OUT_UNIT); j++) PRED[i][j]=0.0;
-      
-      /* 
-      instr=fopen("aa", "a");
-      if(instr==NULL){ Rprintf("can't write to file\n"); }
-      */  
-      
-for(iter=1; iter<=warm2+(*total_iteration); iter++){
+    for(i=1; i<=(*popN); i++){
+      if(k<(*popN) && sfvalue[i]<maxE){
+        k++;
+        fvalue[k]=sfvalue[i];
+        for(j=1; j<=dim; j++){ x[k][j]=sx[i][j]; WW[k][j]=sWW[i][j]; }
         
-        if(iter<=WARM*stepscale) delta=rho;
-        else delta=rho*exp(-tau*log(1.0*(iter-(WARM-1)*stepscale)/stepscale));
-        
+        if(fvalue[k]>maxE) pos[k]=grid;
+        else if(fvalue[k]<lowE) pos[k]=0;
+        else pos[k]=floor((fvalue[k]-lowE)*scale);
+      }
+      if(k>0 && pos[k]>=grid) k--; 
+    }
+    // Rprintf("Initial points k=%d\n", k);
+  }
+  
+  
+  /*
+  for(i=1; i<=(*popN); i++){
+  Rprintf("pos[%d]=%d, %g\n",i,pos[i],fvalue[i]);
+  un=cost(x[i],WW[i],&(AIC[i]),&(BIC[i]));
+  Rprintf("un=%g\n", un);
+  }
+  */
+  
+  for(j=1; j<=dim; j++) net[j]=0.0;
+  for(j=1; j<=(*P)+1; j++) prob[j]=0.0;
+  total_weight=0.0; energy=0.0; bias=predbias=0.0;  KLAIC=KLBIC=KLEBIC=0.0;
+  accept_mut=0; total_mut=1; linearity=0.0;  count=0;
+  for(i=1; i<=(*data_num); i++)
+    for(j=1; j<=(*OUT_UNIT); j++) FIT[i][j]=0.0;
+  for(i=1; i<=(*test_num); i++)
+    for(j=1; j<=(*OUT_UNIT); j++) PRED[i][j]=0.0;
+  
+  /* 
+  instr=fopen("aa", "a");
+  if(instr==NULL){ Rprintf("can't write to file\n"); }
+  */  
+  
+  for(iter=1; iter<=warm2+(*total_iteration); iter++){
+    
+    if(iter<=WARM*stepscale) delta=rho;
+    else delta=rho*exp(-tau*log(1.0*(iter-(WARM-1)*stepscale)/stepscale));
+    
 #pragma omp parallel for private(i) default(shared)
-        for(i=1; i<=(*popN); i++){
-          mutation_SAMC(x[i],&(fvalue[i]),t[i],WW[i],&(pos[i]),hist,1,&(AIC[i]),&(BIC[i]),&(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num);
-          
-          // if(iter%1000==0) Rprintf("iter=%d pos[%d]=%d fvalue=%g AIC=%g BIC=%g EBIC=%g\n",iter,i,pos[i],fvalue[i],AIC[i],BIC[i],EBIC[i]);
-        }
+    for(i=1; i<=(*popN); i++){
+      mutation_SAMC(x[i],&(fvalue[i]),t[i],WW[i],&(pos[i]),hist,1,&(AIC[i]),&(BIC[i]),&(EBIC[i]), *hd1, *OUT_UNIT, *P, *lambda, *data_num);
+      
+      // if(iter%1000==0) Rprintf("iter=%d pos[%d]=%d fvalue=%g AIC=%g BIC=%g EBIC=%g\n",iter,i,pos[i],fvalue[i],AIC[i],BIC[i],EBIC[i]);
+    }
 #pragma omp barrier      
+    
+    for(j=0; j<grid; j++) locfreq[j]=0;
+    for(i=1; i<=(*popN); i++) locfreq[pos[i]]+=1.0; 
+    
+    for(i=1; i<=(*popN); i++){ if(fvalue[i]<bestE){ bestE=fvalue[i]; bestk=i; }}
+    grid0=floor((bestE-lowE)*scale)-extgrid;
+    if(grid0<0) grid0=0;
+    
+    for(j=grid0; j<grid; j++){
+      hist[j][2]+=delta*(1.0*locfreq[j]/(*popN)-1.0*refden[j]/(grid-grid0));
+      hist[j][3]+=locfreq[j];
+    } 
+    
+    maxE=bestE+range;
+    newgrid=ceil((maxE-lowE)*scale);
+    if(newgrid<grid){
+      for(maxhist=hist[newgrid][2], i=newgrid+1; i<grid; i++){
+        if(hist[i][2]>maxhist) maxhist=hist[i][2];
+        hist[newgrid][3]+=hist[i][3];
+      }
+      for(sum=0.0, i=newgrid; i<grid; i++) sum+=exp(hist[i][2]-maxhist);
+      hist[newgrid][2]=log(sum)+maxhist;
+      
+      for(i=1; i<=(*popN); i++){
+        if(fvalue[i]>maxE){
+          fvalue[i]=fvalue[bestk];
+          pos[i]=pos[bestk];
+          for(j=1; j<=dim; j++){ WW[i][j]=WW[bestk][j]; x[i][j]=x[bestk][j]; }
+        }
+      }
+      grid=newgrid;
+    }
+    
+    /* weight normalization */
+    if(iter==warm2){
+      for(sum=0.0,k0=0,i=grid0; i<grid; i++)
+        if(hist[i][3]<=0.0){ sum+=1.0*refden[i]/(grid-grid0); k0++; }
+        if(k0>0) ave=sum/k0;
+        else ave=0.0;
+        for(i=grid0; i<grid; i++) hist[i][2]=hist[i][2]+log(refden[i]+ave);
+        max=hist[grid0][2];
+        for(i=grid0+1; i<grid; i++)
+          if(hist[i][2]>max) max=hist[i][2];
+          for(sum=0.0, i=grid0; i<grid; i++){ hist[i][2]-=max; sum+=exp(hist[i][2]); }
+          for(i=grid0; i<grid; i++) hist[i][2]=hist[i][2]-log(sum)+log(100.0);
+          /*
+          max=hist[grid0][2];
+          for(i=grid0+1; i<grid; i++)
+          if(hist[i][2]>max) max=hist[i][2];
+          for(i=grid0; i<=grid; i++) hist[i][2]-=max;
+          */
+    }
+    
+    
+    if(iter>warm2 && iter%step==0){
+      for(i=1; i<=(*popN); i++){
         
-        for(j=0; j<grid; j++) locfreq[j]=0;
-        for(i=1; i<=(*popN); i++) locfreq[pos[i]]+=1.0; 
-        
-        for(i=1; i<=(*popN); i++){ if(fvalue[i]<bestE){ bestE=fvalue[i]; bestk=i; }}
-        grid0=floor((bestE-lowE)*scale)-extgrid;
-        if(grid0<0) grid0=0;
-        
-        for(j=grid0; j<grid; j++){
-          hist[j][2]+=delta*(1.0*locfreq[j]/(*popN)-1.0*refden[j]/(grid-grid0));
-          hist[j][3]+=locfreq[j];
-        } 
-        
-        maxE=bestE+range;
-        newgrid=ceil((maxE-lowE)*scale);
-        if(newgrid<grid){
-          for(maxhist=hist[newgrid][2], i=newgrid+1; i<grid; i++){
-            if(hist[i][2]>maxhist) maxhist=hist[i][2];
-            hist[newgrid][3]+=hist[i][3];
+        if(pos[i]<grid){
+          // output the network
+          /*
+          if(iter%1000==0){ 
+          fprintf(instr, "%g %g ", fvalue[i], hist[pos[i]][2]);
+          for(j=1; j<=dim; j++){ if(WW[i][j]!=0) fprintf(instr, " %d", j); }
+          fprintf(instr, "\n");
+          for(j=1; j<=dim; j++){ if(WW[i][j]!=0) fprintf(instr, " %g", x[i][j]); }
+          fprintf(instr, "\n");
           }
-          for(sum=0.0, i=newgrid; i<grid; i++) sum+=exp(hist[i][2]-maxhist);
-          hist[newgrid][2]=log(sum)+maxhist;
+          */ 
           
-          for(i=1; i<=(*popN); i++){
-            if(fvalue[i]>maxE){
-              fvalue[i]=fvalue[bestk];
-              pos[i]=pos[bestk];
-              for(j=1; j<=dim; j++){ WW[i][j]=WW[bestk][j]; x[i][j]=x[bestk][j]; }
+          w=exp(hist[pos[i]][2]); total_weight+=w;
+          energy+=w*fvalue[i]; 
+          
+          count++;
+          sAIC[count]=AIC[i]+hist[pos[i]][2]; 
+          sBIC[count]=BIC[i]+hist[pos[i]][2]; 
+          aAIC[count]=-AIC[i]+hist[pos[i]][2];
+          aBIC[count]=-BIC[i]+hist[pos[i]][2];
+          KLAIC+=-w*AIC[i];
+          KLBIC+=-w*BIC[i];
+          KLEBIC+=-w*EBIC[i];
+          
+          
+          for(s1=0, j=1; j<=dim0; j++){
+            net[j]+=w*WW[i][j];
+            if(j%(1+(*P))!=1 && WW[i][j]==1) s1++;
+          }
+          if(s1==0) linearity+=w;
+          for(j=dim0+1; j<=dim; j++) net[j]+=w*WW[i][j]; 
+          
+          // marginal inclusion prob.
+          for(j=1; j<=(*P)+1; j++) mar[j]=0.0;
+          for(k=1; k<=(*hd1); k++){
+            for(j=(k-1)*((*P)+1)+1; j<=k*((*P)+1); j++) mar[j-(k-1)*((*P)+1)]+=WW[i][j]; }
+          if(shortcut==1){
+            mar[1]+=WW[i][(*hd1)*((*P)+1)+1];
+            for(j=(*hd1)*((*P)+1)+(*hd1)+2; j<=dim; j++) mar[j-(*hd1)*((*P)+1)-(*hd1)]+=WW[i][j];
+          }
+          for(j=1; j<=(*P)+1; j++){ if(mar[j]>0.5) prob[j]+=w; }
+          
+          for(mis1=0, k=1; k<=(*data_num); k++){
+            fitting(data_mat[k],x[i],WW[i],ps2, *hd1, *OUT_UNIT, *P);
+            for(j=1; j<=(*OUT_UNIT); j++){ 
+              mis1+=w*fabs(0.5*(data_y[k][j]-ps2[j]));
+              FIT[k][j]+=w*ps2[j];
+              // Rprintf(" %g %g\n", data_y[k][j], ps2[j]);
             }
           }
-          grid=newgrid;
-        }
-        
-        /* weight normalization */
-        if(iter==warm2){
-          for(sum=0.0,k0=0,i=grid0; i<grid; i++)
-            if(hist[i][3]<=0.0){ sum+=1.0*refden[i]/(grid-grid0); k0++; }
-            if(k0>0) ave=sum/k0;
-            else ave=0.0;
-            for(i=grid0; i<grid; i++) hist[i][2]=hist[i][2]+log(refden[i]+ave);
-            max=hist[grid0][2];
-            for(i=grid0+1; i<grid; i++)
-              if(hist[i][2]>max) max=hist[i][2];
-              for(sum=0.0, i=grid0; i<grid; i++){ hist[i][2]-=max; sum+=exp(hist[i][2]); }
-              for(i=grid0; i<grid; i++) hist[i][2]=hist[i][2]-log(sum)+log(100.0);
-              /*
-              max=hist[grid0][2];
-              for(i=grid0+1; i<grid; i++)
-              if(hist[i][2]>max) max=hist[i][2];
-              for(i=grid0; i<=grid; i++) hist[i][2]-=max;
-              */
-        }
-        
-        
-        if(iter>warm2 && iter%step==0){
-          for(i=1; i<=(*popN); i++){
-            
-            if(pos[i]<grid){
-              // output the network
-              /*
-              if(iter%1000==0){ 
-              fprintf(instr, "%g %g ", fvalue[i], hist[pos[i]][2]);
-              for(j=1; j<=dim; j++){ if(WW[i][j]!=0) fprintf(instr, " %d", j); }
-              fprintf(instr, "\n");
-              for(j=1; j<=dim; j++){ if(WW[i][j]!=0) fprintf(instr, " %g", x[i][j]); }
-              fprintf(instr, "\n");
-              }
-              */ 
-              
-              w=exp(hist[pos[i]][2]); total_weight+=w;
-              energy+=w*fvalue[i]; 
-              
-              count++;
-              sAIC[count]=AIC[i]+hist[pos[i]][2]; 
-              sBIC[count]=BIC[i]+hist[pos[i]][2]; 
-              aAIC[count]=-AIC[i]+hist[pos[i]][2];
-              aBIC[count]=-BIC[i]+hist[pos[i]][2];
-              KLAIC+=-w*AIC[i];
-              KLBIC+=-w*BIC[i];
-              KLEBIC+=-w*EBIC[i];
-              
-              
-              for(s1=0, j=1; j<=dim0; j++){
-                net[j]+=w*WW[i][j];
-                if(j%(1+(*P))!=1 && WW[i][j]==1) s1++;
-              }
-              if(s1==0) linearity+=w;
-              for(j=dim0+1; j<=dim; j++) net[j]+=w*WW[i][j]; 
-              
-              // marginal inclusion prob.
-              for(j=1; j<=(*P)+1; j++) mar[j]=0.0;
-              for(k=1; k<=(*hd1); k++){
-                for(j=(k-1)*((*P)+1)+1; j<=k*((*P)+1); j++) mar[j-(k-1)*((*P)+1)]+=WW[i][j]; }
-              if(shortcut==1){
-                mar[1]+=WW[i][(*hd1)*((*P)+1)+1];
-                for(j=(*hd1)*((*P)+1)+(*hd1)+2; j<=dim; j++) mar[j-(*hd1)*((*P)+1)-(*hd1)]+=WW[i][j];
-              }
-              for(j=1; j<=(*P)+1; j++){ if(mar[j]>0.5) prob[j]+=w; }
-              
-              for(mis1=0, k=1; k<=(*data_num); k++){
-                fitting(data_mat[k],x[i],WW[i],ps2, *hd1, *OUT_UNIT, *P);
-                for(j=1; j<=(*OUT_UNIT); j++){ 
-                  mis1+=w*fabs(0.5*(data_y[k][j]-ps2[j]));
-                  FIT[k][j]+=w*ps2[j];
-                  // Rprintf(" %g %g\n", data_y[k][j], ps2[j]);
-                }
-              }
-              bias+=mis1;
-              
-              for(mis2=0, k=1; k<=(*test_num); k++){
-                fitting(test_mat[k],x[i],WW[i],ps2, *hd1, *OUT_UNIT, *P);
-                for(j=1; j<=(*OUT_UNIT); j++){
-                  mis2+=w*fabs(0.5*(test_y[k][j]-ps2[j]));
-                  PRED[k][j]+=w*ps2[j];
-                }
-              }
-              predbias+=mis2;
+          bias+=mis1;
+          
+          for(mis2=0, k=1; k<=(*test_num); k++){
+            fitting(test_mat[k],x[i],WW[i],ps2, *hd1, *OUT_UNIT, *P);
+            for(j=1; j<=(*OUT_UNIT); j++){
+              mis2+=w*fabs(0.5*(test_y[k][j]-ps2[j]));
+              PRED[k][j]+=w*ps2[j];
             }
+          }
+          predbias+=mis2;
         }
-      } /* end for iter>warm */
+    }
+  } /* end for iter>warm */
 } /* end for iter */
-              //    fclose(instr);
-for(j=1; j<=dim; j++) net[j]/=total_weight;  
-for(j=1; j<=(*P)+1; j++) prob[j]/=total_weight;
-for(k=1; k<=(*data_num); k++) 
-  for(j=1; j<=(*OUT_UNIT); j++) FIT[k][j]/=total_weight;
-for(k=1; k<=(*test_num); k++) 
-  for(j=1; j<=(*OUT_UNIT); j++) PRED[k][j]/=total_weight;  
-bias/=total_weight; 
-predbias/=total_weight;
-KLAIC/=total_weight; KLBIC/=total_weight; KLEBIC/=total_weight;
-
-max=sAIC[1];
-for(j=2; j<=count; j++){
-  if(sAIC[j]>max) max=sAIC[j]; }
-for(sum=0.0, j=1; j<=count; j++)  sum+=exp(sAIC[j]-max);  
-logIAIC=-1.0*(max+log(sum)-log(total_weight)); 
-
-max=sBIC[1];
-for(j=2; j<=count; j++){
-  if(sBIC[j]>max) max=sBIC[j]; }
-for(sum=0.0, j=1; j<=count; j++)  sum+=exp(sBIC[j]-max);
-logIBIC=-1.0*(max+log(sum)-log(total_weight));
-
-max=aAIC[1];
-for(j=2; j<=count; j++){
-  if(aAIC[j]>max) max=aAIC[j]; }
-for(sum=0.0, j=1; j<=count; j++)  sum+=exp(aAIC[j]-max);
-aveAIC=max+log(sum)-log(total_weight);
-
-max=aBIC[1];
-for(j=2; j<=count; j++){
-  if(aBIC[j]>max) max=aBIC[j]; }
-for(sum=0.0, j=1; j<=count; j++)  sum+=exp(aBIC[j]-max);
-aveBIC=max+log(sum)-log(total_weight);
-
-KLAIC-=logIAIC; KLBIC-=logIBIC;
-/*
-ins=fopen("aa.s","a");
-fprintf(ins, " %g %g %g %g %g %g %g %g %g\n",logIAIC,logIBIC,KLAIC,KLBIC,KLEBIC,aveAIC,aveBIC,logIAIC+KLAIC,logIBIC+KLBIC);
-fclose(ins);
-
-ins=fopen("aa.log", "a");
-fprintf(ins, "linearity probability=%g\n", linearity/total_weight);
-fprintf(ins, "mutation: %g  ", 1.0*accept_mut/total_mut); 
-fprintf(ins, "bias=%g predbias=%g \n", bias, predbias);
-fprintf(ins, "logIAIC=%g logIBIC=%g KLAIC=%g KLBIC=%g KLEBIC=%g aveAIC=%g aveBIC=%g mAIC=%g mBIC=%g\n",logIAIC,logIBIC,KLAIC,KLBIC,KLEBIC, aveAIC,aveBIC,logIAIC+KLAIC,logIBIC+KLBIC);
-for(i=1; i<=dim; i++) fprintf(ins, " %g", net[i]);
-fprintf(ins, "\n");
-for(i=1; i<=(*P)+1; i++) fprintf(ins, " %g", prob[i]);
-fprintf(ins, "\n");
-fclose(ins); 
-*/
-ins=fopen("aa.net","w");
-for(i=1; i<=dim; i++) fprintf(ins, " %g", net[i]);
-fprintf(ins, "\n");
-fclose(ins);
-
-ins=fopen("aa.BF", "w");
-fprintf(ins, " %g %g %g\n", linearity/total_weight, 1-linearity/total_weight, linearity/(total_weight-linearity));
-fclose(ins);
-
-ins=fopen("aa.mar", "w");
-for(i=1; i<=(*P)+1; i++) fprintf(ins, " %g", prob[i]);
-fprintf(ins, "\n\n");
-fclose(ins);
-
-for(sum=0.0,k0=0,i=grid0; i<grid; i++)
-  if(hist[i][3]<=0.0){ sum+=1.0*refden[i]/(grid-grid0); k0++; }
-  if(k0>0) ave=sum/k0;
-  else ave=0.0;
-  for(i=grid0; i<grid; i++) hist[i][2]=hist[i][2]+log(refden[i]+ave);
-  // ignore the last subregion in normalization
-  max=hist[grid0][2];
-  for(i=grid0+1; i<grid; i++)
-    if(hist[i][2]>max) max=hist[i][2];
-    for(sum=0.0, i=grid0; i<grid; i++){ hist[i][2]-=max; sum+=exp(hist[i][2]); }
-    for(i=grid0; i<grid; i++) hist[i][2]=hist[i][2]-log(sum)+log(100.0);
-    /*
-    ins=fopen("aa.est", "a");
-    fprintf(ins, "delta=%g \n", delta);
-    if(ins==NULL){ Rprintf("Can't write to file\n"); }
-    for(i=grid0; i<grid; i++){
-    fprintf(ins, "%5d  %10.6f  %10.6f  %10.6f  %g\n",i,hist[i][1],exp(hist[i][2]),
-            hist[i][3],hist[i][2]);
-    }
-    fclose(ins);
-    */ 
-    
-    ins=fopen("aa.fit", "w");
-    if(ins==NULL){ Rprintf("Can't write to file\n");  }
-    for(i=1; i<=(*data_num); i++){ 
-      // fprintf(ins, " %d", i);
-      for(j=1; j<=(*OUT_UNIT); j++) fprintf(ins, "%g",FIT[i][j]);
-      fprintf(ins, "\n");
-    }
-    fclose(ins);
-    
-    ins=fopen("aa.pred","w");
-    for(i=1; i<=(*test_num); i++){
-      //  fprintf(ins, " %d", i);
-      for(j=1; j<=(*OUT_UNIT); j++) fprintf(ins, "  %g",PRED[i][j]);
-      fprintf(ins, "\n");
-    }
-    fclose(ins);
-    
-    
-    PutRNGstate();
-    free_dmatrix(x,1,maxpopN,1,dim);
-    free_dmatrix(sx,1,maxpopN,1,dim);
-    free_dvector(y,1,dim);
-    free_imatrix(WW,1,maxpopN,1,dim);
-    free_imatrix(sWW,1,maxpopN,1,dim);
-    free_ivector(W,1,dim);
-    free_dvector(fvalue,1,maxpopN);
-    free_dvector(sfvalue,1,maxpopN);
-    free_dvector(t,1,maxpopN);
-    free_dmatrix(total_mat,1,((*data_num)+(*test_num)),1,(*P));
-    free_dmatrix(total_y,1,((*data_num)+(*test_num)),1,(*OUT_UNIT));
-    free_dmatrix(data_mat,1,(*data_num),1,(*P));
-    free_dmatrix(test_mat,1,(*test_num),1,(*P));
-    free_dmatrix(data_y,1,(*data_num),1,(*OUT_UNIT));
-    free_dmatrix(test_y,1,(*test_num),1,(*OUT_UNIT));
-    free_ivector(sel,1,(*data_num));
-    free_ivector(rem,1,((*data_num)+(*test_num)));
-    free_dmatrix(FIT,1,(*data_num),1,(*OUT_UNIT));
-    free_dmatrix(PRED,1,(*test_num),1,(*OUT_UNIT));
-    free_dvector(ps2,1,(*OUT_UNIT));
-    free_dvector(wei,1,(*data_num)); 
-    free_dmatrix(hist,0,grid,1,3);
-    free_dvector(refden,0,grid);
-    free_ivector(pos,0,grid);
-    free_dvector(locfreq,0,grid);
-    free_dvector(net,1,dim);
-    free_ivector(indx,1,1000);
-    free_dvector(fx,1,1000);
-    free_dvector(fy,1,1000);
-    free_dvector(prob,1,(*P)+1);
-    free_dvector(mar,1,(*P)+1);
-    free_dvector(AIC,1,maxpopN);
-    free_dvector(BIC,1,maxpopN);
-    free_dvector(EBIC,1,maxpopN);
-    free_dvector(sAIC,1,(*popN)*(*total_iteration));
-    free_dvector(sBIC,1,(*popN)*(*total_iteration));
-    free_dvector(aAIC,1,(*popN)*(*total_iteration));
-    free_dvector(aBIC,1,(*popN)*(*total_iteration));
-    
-    //return 0;
-}              
+          //    fclose(instr);
+          for(j=1; j<=dim; j++) net[j]/=total_weight;  
+  for(j=1; j<=(*P)+1; j++) prob[j]/=total_weight;
+  for(k=1; k<=(*data_num); k++) 
+    for(j=1; j<=(*OUT_UNIT); j++) FIT[k][j]/=total_weight;
+  for(k=1; k<=(*test_num); k++) 
+    for(j=1; j<=(*OUT_UNIT); j++) PRED[k][j]/=total_weight;  
+  bias/=total_weight; 
+  predbias/=total_weight;
+  KLAIC/=total_weight; KLBIC/=total_weight; KLEBIC/=total_weight;
+  
+  max=sAIC[1];
+  for(j=2; j<=count; j++){
+    if(sAIC[j]>max) max=sAIC[j]; }
+  for(sum=0.0, j=1; j<=count; j++)  sum+=exp(sAIC[j]-max);  
+  logIAIC=-1.0*(max+log(sum)-log(total_weight)); 
+  
+  max=sBIC[1];
+  for(j=2; j<=count; j++){
+    if(sBIC[j]>max) max=sBIC[j]; }
+  for(sum=0.0, j=1; j<=count; j++)  sum+=exp(sBIC[j]-max);
+  logIBIC=-1.0*(max+log(sum)-log(total_weight));
+  
+  max=aAIC[1];
+  for(j=2; j<=count; j++){
+    if(aAIC[j]>max) max=aAIC[j]; }
+  for(sum=0.0, j=1; j<=count; j++)  sum+=exp(aAIC[j]-max);
+  //aveAIC=max+log(sum)-log(total_weight);
+  
+  max=aBIC[1];
+  for(j=2; j<=count; j++){
+    if(aBIC[j]>max) max=aBIC[j]; }
+  for(sum=0.0, j=1; j<=count; j++)  sum+=exp(aBIC[j]-max);
+  //aveBIC=max+log(sum)-log(total_weight);
+  
+  KLAIC-=logIAIC; KLBIC-=logIBIC;
+  /*
+  ins=fopen("aa.s","a");
+  fprintf(ins, " %g %g %g %g %g %g %g %g %g\n",logIAIC,logIBIC,KLAIC,KLBIC,KLEBIC,aveAIC,aveBIC,logIAIC+KLAIC,logIBIC+KLBIC);
+  fclose(ins);
+  
+  ins=fopen("aa.log", "a");
+  fprintf(ins, "linearity probability=%g\n", linearity/total_weight);
+  fprintf(ins, "mutation: %g  ", 1.0*accept_mut/total_mut); 
+  fprintf(ins, "bias=%g predbias=%g \n", bias, predbias);
+  fprintf(ins, "logIAIC=%g logIBIC=%g KLAIC=%g KLBIC=%g KLEBIC=%g aveAIC=%g aveBIC=%g mAIC=%g mBIC=%g\n",logIAIC,logIBIC,KLAIC,KLBIC,KLEBIC, aveAIC,aveBIC,logIAIC+KLAIC,logIBIC+KLBIC);
+  for(i=1; i<=dim; i++) fprintf(ins, " %g", net[i]);
+  fprintf(ins, "\n");
+  for(i=1; i<=(*P)+1; i++) fprintf(ins, " %g", prob[i]);
+  fprintf(ins, "\n");
+  fclose(ins); 
+  */
+  ins=fopen("aa.net","w");
+  for(i=1; i<=dim; i++) fprintf(ins, " %g", net[i]);
+  fprintf(ins, "\n");
+  fclose(ins);
+  
+  ins=fopen("aa.BF", "w");
+  fprintf(ins, " %g %g %g\n", linearity/total_weight, 1-linearity/total_weight, linearity/(total_weight-linearity));
+  fclose(ins);
+  
+  ins=fopen("aa.mar", "w");
+  for(i=1; i<=(*P)+1; i++) fprintf(ins, " %g", prob[i]);
+  fprintf(ins, "\n\n");
+  fclose(ins);
+  
+  for(sum=0.0,k0=0,i=grid0; i<grid; i++)
+    if(hist[i][3]<=0.0){ sum+=1.0*refden[i]/(grid-grid0); k0++; }
+    if(k0>0) ave=sum/k0;
+    else ave=0.0;
+    for(i=grid0; i<grid; i++) hist[i][2]=hist[i][2]+log(refden[i]+ave);
+    // ignore the last subregion in normalization
+    max=hist[grid0][2];
+    for(i=grid0+1; i<grid; i++)
+      if(hist[i][2]>max) max=hist[i][2];
+      for(sum=0.0, i=grid0; i<grid; i++){ hist[i][2]-=max; sum+=exp(hist[i][2]); }
+      for(i=grid0; i<grid; i++) hist[i][2]=hist[i][2]-log(sum)+log(100.0);
+      /*
+      ins=fopen("aa.est", "a");
+      fprintf(ins, "delta=%g \n", delta);
+      if(ins==NULL){ Rprintf("Can't write to file\n"); }
+      for(i=grid0; i<grid; i++){
+      fprintf(ins, "%5d  %10.6f  %10.6f  %10.6f  %g\n",i,hist[i][1],exp(hist[i][2]),
+              hist[i][3],hist[i][2]);
+      }
+      fclose(ins);
+      */ 
+      
+      ins=fopen("aa.fit", "w");
+      if(ins==NULL){ Rprintf("Can't write to file\n");  }
+      for(i=1; i<=(*data_num); i++){ 
+        // fprintf(ins, " %d", i);
+        for(j=1; j<=(*OUT_UNIT); j++) fprintf(ins, "%g",FIT[i][j]);
+        fprintf(ins, "\n");
+      }
+      fclose(ins);
+      
+      ins=fopen("aa.pred","w");
+      for(i=1; i<=(*test_num); i++){
+        //  fprintf(ins, " %d", i);
+        for(j=1; j<=(*OUT_UNIT); j++) fprintf(ins, "  %g",PRED[i][j]);
+        fprintf(ins, "\n");
+      }
+      fclose(ins);
+      
+      
+      PutRNGstate();
+      free_dmatrix(x,1,maxpopN,1,dim);
+      free_dmatrix(sx,1,maxpopN,1,dim);
+      free_dvector(y,1,dim);
+      free_imatrix(WW,1,maxpopN,1,dim);
+      free_imatrix(sWW,1,maxpopN,1,dim);
+      free_ivector(W,1,dim);
+      free_dvector(fvalue,1,maxpopN);
+      free_dvector(sfvalue,1,maxpopN);
+      free_dvector(t,1,maxpopN);
+      free_dmatrix(total_mat,1,((*data_num)+(*test_num)),1,(*P));
+      free_dmatrix(total_y,1,((*data_num)+(*test_num)),1,(*OUT_UNIT));
+      free_dmatrix(data_mat,1,(*data_num),1,(*P));
+      free_dmatrix(test_mat,1,(*test_num),1,(*P));
+      free_dmatrix(data_y,1,(*data_num),1,(*OUT_UNIT));
+      free_dmatrix(test_y,1,(*test_num),1,(*OUT_UNIT));
+      free_ivector(sel,1,(*data_num));
+      free_ivector(rem,1,((*data_num)+(*test_num)));
+      free_dmatrix(FIT,1,(*data_num),1,(*OUT_UNIT));
+      free_dmatrix(PRED,1,(*test_num),1,(*OUT_UNIT));
+      free_dvector(ps2,1,(*OUT_UNIT));
+      free_dvector(wei,1,(*data_num)); 
+      free_dmatrix(hist,0,grid,1,3);
+      free_dvector(refden,0,grid);
+      free_ivector(pos,0,grid);
+      free_dvector(locfreq,0,grid);
+      free_dvector(net,1,dim);
+      free_ivector(indx,1,1000);
+      free_dvector(fx,1,1000);
+      free_dvector(fy,1,1000);
+      free_dvector(prob,1,(*P)+1);
+      free_dvector(mar,1,(*P)+1);
+      free_dvector(AIC,1,maxpopN);
+      free_dvector(BIC,1,maxpopN);
+      free_dvector(EBIC,1,maxpopN);
+      free_dvector(sAIC,1,(*popN)*(*total_iteration));
+      free_dvector(sBIC,1,(*popN)*(*total_iteration));
+      free_dvector(aAIC,1,(*popN)*(*total_iteration));
+      free_dvector(aBIC,1,(*popN)*(*total_iteration));
+      
+      //return 0;
+      }            
               
       
 void

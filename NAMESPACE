@@ -1,3 +1,4 @@
 useDynLib(BNN,.registration = TRUE)
+import(mvtnorm)
 importFrom("utils", "read.table")
 export(BNNsel,BNNprior)

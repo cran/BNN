@@ -1,4 +1,4 @@
-BNNsel <- function(X,Y,train_num = as.integer(0.8*N), hid_num = 3, lambda=0.025, total_iteration = 1000000, popN=20, nCPUs = 20 )
+BNNsel <- function(X,Y,train_num = as.integer(0.8*N), hid_num = 3, lambda=0.025, total_iteration=1000000, popN=20, nCPUs = 20)
 {
   N <- dim(X)[1]
   P <- dim(X)[2]
@@ -8,7 +8,7 @@ BNNsel <- function(X,Y,train_num = as.integer(0.8*N), hid_num = 3, lambda=0.025,
   DataX=DataY=NULL;
   for(i in 1:N)
   {
-    for(j in 1:P) DataX[(i-1)*P+j]=X[i,j];
+    for(j in 1:P) DataX[(i-1)*P+j]=as.numeric(X[i,j]);
     for(j in 1:OUT_UNIT) DataY[(i-1)*OUT_UNIT+j]=Y[i,j];
   }
  # system("ulimit -s unlimited")
